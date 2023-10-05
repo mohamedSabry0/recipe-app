@@ -1,5 +1,3 @@
-require 'pry'
-
 class RecipesController < ApplicationController
   before_action :authenticate_user!, except: [:show]
 
@@ -22,7 +20,6 @@ class RecipesController < ApplicationController
         Food.where(id: food_ids).each do |food|
           RecipeFood.create!(food:, recipe: @recipe, quantity: params[:recipe][:quantity])
         end
-        # @recipe.foods << foods_to_add
         flash[:notice] = 'Ingredients added successfully.'
         redirect_to @recipe
         return
@@ -37,8 +34,6 @@ class RecipesController < ApplicationController
   def show
     @recipe = Recipe.find(params[:id])
     @user = @recipe.user
-    # p "recipe user:#{@user.id}"
-    # p "recipe user:#{current_user.id}"
     @recipe_food = @recipe.foods.joins(:recipe_foods).select('foods.*,recipe_foods.quantity').distinct
   end
 
@@ -102,7 +97,6 @@ class RecipesController < ApplicationController
   def generate_shopping_list
     @recipe = Recipe.find(params[:id])
     p params[:inventory_id], 'inventory_id'
-    # p params[:recipe][:inventory_id], 'recipe_inventory_id'
     p params[:recipe], 'recipe'
 
     return unless params[:inventory_id].present?
@@ -113,8 +107,6 @@ class RecipesController < ApplicationController
       .where.not(id: @inventory.foods.pluck(:id))
       .distinct
     @total_value = @required_foods.sum { |food| food.quantity.to_i * food.price.to_f }
-
-    # redirect_to generate_shopping_list_recipe_path(@recipe)
   end
 
   def destroy
